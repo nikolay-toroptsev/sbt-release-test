@@ -1,4 +1,5 @@
-package com.onefactor.sbt-release-test.module2
+package com.onefactor.sbt.module2
+
 
 object Module2 {
 

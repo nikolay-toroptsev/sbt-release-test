@@ -1,4 +1,4 @@
-package com.onefactor.sbt-release-test.module1
+package com.onefactor.sbt.module1
 
 trait Module1 {
 
