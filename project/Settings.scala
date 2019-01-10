@@ -1,7 +1,8 @@
 import sbt._
 import Keys.{publishTo, _}
 import sbtassembly.AssemblyPlugin.autoImport._
-
+import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseVersionBump}
+import sbtrelease.ReleaseStateTransformations._
 
 object Settings {
 
@@ -16,7 +17,20 @@ object Settings {
       } else {
         Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
       }
-    }
+    },
+    releaseVersionBump := sbtrelease.Version.Bump.Next,
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      publishArtifacts,
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
+    )
   )
 
   lazy val testSettings = Seq(
