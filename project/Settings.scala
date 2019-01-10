@@ -9,7 +9,14 @@ object Settings {
     organization := "com.onefactor.sbt",
     scalaVersion := "2.12.0",
     publishMavenStyle := true,
-    publishArtifact in Test := false
+    publishArtifact in Test := false,
+    publishTo := {
+      if (isSnapshot.value) {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
+      } else {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
+      }
+    }
   )
 
   lazy val testSettings = Seq(
@@ -33,34 +40,11 @@ object Settings {
       case PathList("META-INF", xs@_*) => MergeStrategy.discard
       case n if n.startsWith("reference.conf") => MergeStrategy.concat
       case _ => MergeStrategy.first
-    },
-    publishTo := {
-      if (isSnapshot.value) {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
-      } else {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
-      }
     }
   )
 
-  lazy val module1Settings = Seq(
-    publishTo := {
-      if (isSnapshot.value) {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
-      } else {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
-      }
-    }
-  )
+  lazy val module1Settings = Seq()
 
-  lazy val module2Settings = Seq(
-    publishTo := {
-      if (isSnapshot.value) {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
-      } else {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
-      }
-    }
-  )
+  lazy val module2Settings = Seq()
 
 }
