@@ -14,12 +14,5 @@ lazy val module2 = (project in file("module2")).
 lazy val myapp = (project in file("myapp")).
   settings(Settings.settings: _*).
   settings(Settings.myappSettings: _*).
-  settings(publishTo := {
-    if (isSnapshot.value) {
-      Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
-    } else {
-      Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
-    }
-  }).
   dependsOn(module1, module2).
   configs(Test)

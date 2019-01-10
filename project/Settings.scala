@@ -6,11 +6,17 @@ import sbtassembly.AssemblyPlugin.autoImport._
 object Settings {
 
   lazy val settings = Seq(
-    organization := "com.onefactor.sbt-release-test",
-    version := "0.0.1-SNAPSHOT" + sys.props.getOrElse("buildNumber", default="0-SNAPSHOT"),
+    organization := "com.onefactor.sbt",
     scalaVersion := "2.12.0",
     publishMavenStyle := true,
-    publishArtifact in Test := false
+    publishArtifact in Test := false,
+    publishTo := {
+      if (isSnapshot.value) {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
+      } else {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
+      }
+    }
   )
 
   lazy val testSettings = Seq(
