@@ -17,7 +17,20 @@ object Settings {
       } else {
         Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
       }
-    }
+    },
+    releaseVersionBump := sbtrelease.Version.Bump.Next,
+    releaseProcess := Seq[ReleaseStep](
+      checkSnapshotDependencies,
+      runClean,
+      runTest,
+      setReleaseVersion,
+      commitReleaseVersion,
+      tagRelease,
+      publishArtifacts,
+      setNextVersion,
+      commitNextVersion,
+      pushChanges
+    )
   )
 
   lazy val testSettings = Seq(
@@ -41,20 +54,7 @@ object Settings {
       case PathList("META-INF", xs@_*) => MergeStrategy.discard
       case n if n.startsWith("reference.conf") => MergeStrategy.concat
       case _ => MergeStrategy.first
-    },
-    releaseVersionBump := sbtrelease.Version.Bump.Next,
-    releaseProcess := Seq[ReleaseStep](
-      checkSnapshotDependencies,
-      runClean,
-      runTest,
-      setReleaseVersion,
-      commitReleaseVersion,
-      tagRelease,
-      publishArtifacts,
-      setNextVersion,
-      commitNextVersion,
-      pushChanges
-    )
+    }
   )
 
   lazy val module1Settings = Seq()
