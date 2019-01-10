@@ -21,6 +21,7 @@ object Settings {
     releaseVersionBump := sbtrelease.Version.Bump.Next,
     releaseProcess := Seq[ReleaseStep](
       checkSnapshotDependencies,
+      inquireVersions,
       runClean,
       runTest,
       setReleaseVersion,

@@ -13,7 +13,6 @@ lazy val module2 = (project in file("module2"))
   .settings(libraryDependencies ++= module2Dependencies)
 
 lazy val myapp = (project in file("myapp"))
-  .enablePlugins(ReleasePlugin)
   .settings(Settings.settings: _*)
   .settings(Settings.myappSettings: _*)
   .dependsOn(module1, module2)
