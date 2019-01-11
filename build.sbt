@@ -20,6 +20,7 @@ lazy val myapp = (project in file("myapp"))
 
 lazy val root = (project in file("."))
   .enablePlugins(ReleasePlugin)
+  .settings(Settings.settings: _*)
   .settings(
     releaseProcess := Seq[ReleaseStep](
         checkSnapshotDependencies,
