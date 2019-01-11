@@ -1,5 +1,5 @@
 pipeline {
-    agent {
+    /*agent {
         docker {
             image 'onef-docker-registry.jfrog.io/ml-build-env:0.1.0'
             label 'geomind'
@@ -12,7 +12,7 @@ pipeline {
                     "-v global-pipenv-cache:/root/.cache/pipenv " +
                     "-v /var/run/docker.sock:/var/run/docker.sock"
         }
-    }
+    }*/
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
