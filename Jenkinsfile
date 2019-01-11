@@ -104,6 +104,8 @@ pipeline {
             }
             steps {
                 sh 'sbt postRelease'
+                //push scm
+                //push tags
             }
         }
 
