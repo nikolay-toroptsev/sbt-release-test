@@ -52,7 +52,7 @@ pipeline {
             steps {
                 checkout scm
                 // sh 'git checkout'
-                sh 'git config user.name "Jenkins"'
+                sh 'git config user.name "jenkins-1f"'
                 sh 'git config user.email "jenkins@onefactor.com"'
                 sh 'sbt clean'
             }
@@ -64,7 +64,7 @@ pipeline {
             }
             steps {
                 sh 'git checkout master'
-                sh 'git remote set-url origin git@github.com:nikolay-toroptsev/sbt-release-test.git'
+                // sh 'git remote set-url origin git@github.com:nikolay-toroptsev/sbt-release-test.git'
                 sh 'sbt "release with-defaults default-tag-exists-answer o"'
             }
         }
