@@ -34,7 +34,15 @@ lazy val root = (project in file("."))
   )
   .settings(
       postRelease := {
-          
+            
+          val releaseVersion = (sbt.Keys.version in ThisBuild).value
+          println(releaseVersion)
+          val nextVersion = sbtrelease.Version(releaseVersion).get.bumpMinor.asSnapshot.string
+          println(nextVersion)
+          val versionFile = Project.extract((state in ThisBuild).value).get(releaseVersionFile)
+          IO.writeLines(versionFile, Seq(globalVersionString format nextVersion))
+          sbt.Keys.version in ThisBuild := nextVersion
+          git.runner.value.commitAndPush("Post release new snapshot version")(file("."), ConsoleLogger())
       }
   )
   .settings(Settings.settings: _*)
