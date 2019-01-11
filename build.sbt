@@ -44,4 +44,3 @@ lazy val root = (project in file("."))
           git.runner.value.commitAndPush("Post release new snapshot version")(file("."), ConsoleLogger())
       }
   )
-  .settings(Settings.settings: _*)
