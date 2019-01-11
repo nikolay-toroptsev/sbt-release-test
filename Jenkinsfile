@@ -64,6 +64,7 @@ pipeline {
             }
             steps {
                 sh 'git checkout master'
+                sh 'git remote set-url origin git@github.com:nikolay-toroptsev/sbt-release-test.git'
                 sh 'sbt "release with-defaults default-tag-exists-answer o"'
             }
         }
