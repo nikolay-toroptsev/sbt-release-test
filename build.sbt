@@ -21,7 +21,7 @@ lazy val myapp = (project in file("myapp"))
   .configs(Test)
 
 lazy val root = (project in file("."))
-  .enablePlugins(ReleasePlugin)
+  .enablePlugins(ReleasePlugin, PostReleasePlugin)
   .settings(Settings.settings: _*)
   .settings(
     releaseProcess := Seq[ReleaseStep](
@@ -31,16 +31,4 @@ lazy val root = (project in file("."))
         commitReleaseVersion,
         tagRelease
     )
-  )
-  .settings(
-      postRelease := {
-          val releaseVersion = (sbt.Keys.version in ThisBuild).value
-          println(s"Release version: $releaseVersion")
-          val nextVersion = sbtrelease.Version(releaseVersion).get.bumpMinor.asSnapshot.string
-          println(s"Next snapshot version: $nextVersion")
-          val versionFile = Project.extract((state in ThisBuild).value).get(releaseVersionFile)
-          IO.writeLines(versionFile, Seq(globalVersionString format nextVersion))
-          sbt.Keys.version in ThisBuild := nextVersion
-          git.runner.value.commitAndPush("Post release new snapshot version")(file("."), ConsoleLogger())
-      }
   )
