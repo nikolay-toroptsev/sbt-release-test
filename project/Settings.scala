@@ -1,49 +1,36 @@
-import com.typesafe.sbt.SbtGit.git
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyPlugin.autoImport._
-import sbt.Version
+
 
 object Settings {
 
-  lazy val release = taskKey[Unit]("Release task")
+//  lazy val release = taskKey[Unit]("Release task")
   lazy val postRelease = taskKey[Unit]("Post release ефыл")
 
   lazy val settings = Seq(
     organization := "com.onefactor.sbt",
     scalaVersion := "2.12.0",
     publishMavenStyle := true,
-    publishArtifact in Test := false,
-    release := {
-      val v = Version(version.value).get
-      val releaseVersion = v.withoutQualifier.string
-      println(releaseVersion)
-      version := releaseVersion
-      println(version.value)
-      val gitRunner = git.runner.value
-      gitRunner.commitAndPush(s"Release $releaseVersion", Some(releaseVersion))
-//      val version = Version("1.3.1-SNAPSHOT").get
-//      println(version)
-//      val release = version.copy(qualifier = None)
-//      println(release.string)
-//      val bumpedMinor = version.bumpMinor
-//      println(bumpedMinor.string)
-    },
-    postRelease := {
-      println(version.value)
-    }
-//    releaseProcess := Seq[ReleaseStep](
-//      checkSnapshotDependencies,
-//      inquireVersions,
-//      setReleaseVersion,
-//      commitReleaseVersion,
-//      tagRelease
-//    ),
-//    postReleaseProcess := Seq[ReleaseStep](
-//      setNextVersion,
-//      commitNextVersion,
-//      pushChanges
-//    ),
+    publishArtifact in Test := false
+//    release := {
+//      val v = Version(version.value).get
+//      val releaseVersion = v.withoutQualifier.string
+//      println(releaseVersion)
+//      version := releaseVersion
+//      println(version.value)
+//      val gitRunner = git.runner.value
+//      gitRunner.commitAndPush(s"Release $releaseVersion", Some(releaseVersion))
+//    },
+//    releaseVersionBump := sbtrelease.Version.Bump.Minor,
+    
+    //    postRelease := {
+    //      println(version.value)
+    //      val newVersion = sbtrelease.Version(version.value).get.bumpMinor.asSnapshot
+    //      println(newVersion.string)
+    //      version := newVersion.string
+    //      git.runner.value.commitAndPush("Post release new snapshot version")
+    //    }
   )
 
   lazy val testSettings = Seq(

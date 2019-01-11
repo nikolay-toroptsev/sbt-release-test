@@ -1,5 +1,6 @@
 import Dependencies._
 import Keys._
+import sbtrelease._
 
 lazy val module1 = (project in file("module1"))
   .settings(Settings.settings: _*)
@@ -18,4 +19,14 @@ lazy val myapp = (project in file("myapp"))
   .configs(Test)
 
 lazy val root = (project in file("."))
+  .enablePlugins(SbtRelease)
+    .settings(
+      releaseProcess := Seq[ReleaseStep](
+        checkSnapshotDependencies,
+        inquireVersions,
+        setReleaseVersion,
+        commitReleaseVersion,
+        tagRelease
+      )
+    )
   .settings(Settings.settings: _*)
