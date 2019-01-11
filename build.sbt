@@ -34,11 +34,10 @@ lazy val root = (project in file("."))
   )
   .settings(
       postRelease := {
-            
           val releaseVersion = (sbt.Keys.version in ThisBuild).value
-          println(releaseVersion)
+          println(s"Release version: $releaseVersion")
           val nextVersion = sbtrelease.Version(releaseVersion).get.bumpMinor.asSnapshot.string
-          println(nextVersion)
+          println(s"Next snapshot version: $nextVersion")
           val versionFile = Project.extract((state in ThisBuild).value).get(releaseVersionFile)
           IO.writeLines(versionFile, Seq(globalVersionString format nextVersion))
           sbt.Keys.version in ThisBuild := nextVersion
