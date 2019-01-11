@@ -27,7 +27,8 @@ object PostReleasePlugin extends AutoPlugin {
       val versionFile = Project.extract((state in ThisBuild).value).get(releaseVersionFile)
       IO.writeLines(versionFile, Seq(globalVersionString format nextVersion))
       ReleaseStateTransformations.reapply(Seq(version in ThisBuild := nextVersion), (state in ThisBuild).value)
-      git.runner.value.commitAndPush("Post release new snapshot version", Some("snapshot-tag"))(file("."), ConsoleLogger())
+//      git.runner.value.commitAndPush("Post release new snapshot version")(file("."), ConsoleLogger())
+      git.runner.value("commit -m 'Post release new snapshot version'")(file("."), ConsoleLogger())
     }
   )
 }
