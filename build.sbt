@@ -2,8 +2,6 @@ import Dependencies._
 import sbt.Keys._
 import sbtrelease.ReleaseStateTransformations._
 
-lazy val postRelease = taskKey[Unit]("Post release task")
-
 lazy val module1 = (project in file("module1"))
   .settings(Settings.settings: _*)
   .settings(Settings.module1Settings: _*)
