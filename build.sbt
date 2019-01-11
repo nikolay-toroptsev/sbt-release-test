@@ -21,13 +21,6 @@ lazy val myapp = (project in file("myapp"))
 lazy val root = (project in file("."))
   .enablePlugins(ReleasePlugin)
   .settings(
-    publishTo := {
-      if (isSnapshot.value) {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
-      } else {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
-      }
-    },
     releaseProcess := Seq[ReleaseStep](
         checkSnapshotDependencies,
         inquireVersions,

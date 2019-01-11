@@ -12,7 +12,14 @@ object Settings {
     organization := "com.onefactor.sbt",
     scalaVersion := "2.12.0",
     publishMavenStyle := true,
-    publishArtifact in Test := false
+    publishArtifact in Test := false,
+    publishTo := {
+      if (isSnapshot.value) {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
+      } else {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
+      }
+    }
 //    release := {
 //      val v = Version(version.value).get
 //      val releaseVersion = v.withoutQualifier.string
