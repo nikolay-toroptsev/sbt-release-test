@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'onef-docker-registry.jfrog.io/ml-build-env:0.1.0'
-            label 'geomind'
+            label 'agent-with-docker'
             args "-u root " +
                     "--entrypoint=/entrypoint.sh " +
                     "-v ivy-home-${"${env.JOB_NAME}".replaceAll("\\/", "--")}:/root/.ivy2 " +
