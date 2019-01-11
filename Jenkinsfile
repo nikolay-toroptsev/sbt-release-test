@@ -104,7 +104,7 @@ pipeline {
             }
             steps {
                 sh 'sbt postRelease'
-                sh 'git push --tag
+                sh 'git push --tag'
                 //push scm
                 //push tags
             }
