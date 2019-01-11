@@ -2,7 +2,7 @@ import com.typesafe.sbt.GitPlugin
 import com.typesafe.sbt.SbtGit.git
 import sbt.Keys._
 import sbt._
-import sbtrelease.ReleasePlugin
+import sbtrelease.{ReleasePlugin, ReleaseStateTransformations}
 import sbtrelease.ReleasePlugin.autoImport.releaseVersionFile
 import sbtrelease.ReleaseStateTransformations.globalVersionString
 
@@ -23,7 +23,7 @@ object PostReleasePlugin extends AutoPlugin {
       println(s"Next snapshot version: $nextVersion")
       val versionFile = Project.extract((state in ThisBuild).value).get(releaseVersionFile)
       IO.writeLines(versionFile, Seq(globalVersionString format nextVersion))
-      version in ThisBuild := nextVersion
+      ReleaseStateTransformations.reapply(Seq(version in ThisBuild := nextVersion), (state in ThisBuild).value)
       git.runner.value.commitAndPush("Post release new snapshot version")(file("."), ConsoleLogger())
     }
   )
