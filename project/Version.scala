@@ -1,3 +1,5 @@
+package sbt
+
 import scala.util.control.Exception.allCatch
 
 object Version {

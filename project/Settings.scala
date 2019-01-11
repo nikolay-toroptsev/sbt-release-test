@@ -1,6 +1,8 @@
+import com.typesafe.sbt.SbtGit.git
 import sbt.Keys._
 import sbt._
 import sbtassembly.AssemblyPlugin.autoImport._
+import sbt.Version
 
 object Settings {
 
@@ -13,10 +15,22 @@ object Settings {
     publishMavenStyle := true,
     publishArtifact in Test := false,
     release := {
-      println(version)
+      val v = Version(version.value).get
+      val releaseVersion = v.withoutQualifier.string
+      println(releaseVersion)
+      version := releaseVersion
+      println(version.value)
+      val gitRunner = git.runner.value
+      gitRunner.commitAndPush(s"Release $releaseVersion", Some(releaseVersion))
+//      val version = Version("1.3.1-SNAPSHOT").get
+//      println(version)
+//      val release = version.copy(qualifier = None)
+//      println(release.string)
+//      val bumpedMinor = version.bumpMinor
+//      println(bumpedMinor.string)
     },
     postRelease := {
-      println(version)
+      println(version.value)
     }
 //    releaseProcess := Seq[ReleaseStep](
 //      checkSnapshotDependencies,
