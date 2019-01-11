@@ -28,10 +28,9 @@ pipeline {
         SBT_OPTS = "-Xmx3G"
     }
 
+    def getDefaultValue = env.BRANCH_NAME == 'master' ? true : false
+
     parameters {
-        script {
-            def getDefaultValue = env.BRANCH_NAME == 'master' ? true : false
-        }
         booleanParam(name: 'RUN_ALL_STAGES_ON_MASTER', defaultValue: true, description: 'Uncheck to enable stages configuration on master')
         booleanParam(name: 'RELEASE', defaultValue: false, description: 'Release version')
         booleanParam(name: 'PACKAGE', defaultValue: true, description: 'Package jars')
