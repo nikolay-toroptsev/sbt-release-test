@@ -60,7 +60,7 @@ pipeline {
                 expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
-                sh 'sbt release with-defaults default-tag-exists-answer o'
+                sh 'sbt "release with-defaults default-tag-exists-answer o"'
             }
         }
 
