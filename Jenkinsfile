@@ -1,18 +1,5 @@
 pipeline {
-    /*agent {
-        docker {
-            image 'onef-docker-registry.jfrog.io/ml-build-env:0.1.0'
-            label 'geomind'
-            args "-u root " +
-                    "--entrypoint=/entrypoint.sh " +
-                    "-v ivy-home-${"${env.JOB_NAME}".replaceAll("\\/", "--")}:/root/.ivy2 " +
-                    "-v global-sbt-boot:/root/.sbt/boot " +
-                    "-v global-sbt-coursier-cache:/root/.coursier/cache " +
-                    "-v global-pip-cache:/root/.cache/pip " +
-                    "-v global-pipenv-cache:/root/.cache/pipenv " +
-                    "-v /var/run/docker.sock:/var/run/docker.sock"
-        }
-    }*/
+    agent any
 
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
