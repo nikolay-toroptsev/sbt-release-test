@@ -51,6 +51,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+                // sh 'git checkout'
                 sh 'git config user.name "Jenkins"'
                 sh 'git config user.email "jenkins@onefactor.com"'
                 sh 'sbt clean'
@@ -62,6 +63,7 @@ pipeline {
                 expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
+                sh 'git checkout master'
                 sh 'sbt "release with-defaults default-tag-exists-answer o"'
             }
         }
@@ -100,7 +102,6 @@ pipeline {
                 expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
-                sh 'git pull'
                 sh 'sbt postRelease'
             }
         }
