@@ -37,6 +37,8 @@ pipeline {
         booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
     }
 
+    // def masterCheck() = env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER
+
     stages {
 
         stage('Prepare env') {
@@ -50,6 +52,15 @@ pipeline {
             steps {
                 checkout scm
                 sh 'sbt clean'
+            }
+        }
+
+        stage('Release') {
+            when {
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
+            }
+            steps {
+                sh 'sbt release with-defaults default-tag-exists-answer o'
             }
         }
 
@@ -74,21 +85,13 @@ pipeline {
 
         stage('Publish') {
             when {
-                expression { return (params.PUBLISH || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) && !params.RELEASE) }
+                expression { return params.PUBLISH || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) }
             }
             steps {
                 sh 'sbt publish'
             }
         }
 
-        stage('Release') {
-            when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
-            }
-            steps {
-                sh 'sbt release'
-            }
-        }
 
         stage('Post release') {
             when {
@@ -114,3 +117,5 @@ pipeline {
         }
     }
 }
+
+
