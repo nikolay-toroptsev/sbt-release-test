@@ -100,6 +100,7 @@ pipeline {
                 expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
+                sh 'git checkout master'
                 sh 'sbt postRelease'
             }
         }
