@@ -19,14 +19,21 @@ lazy val myapp = (project in file("myapp"))
   .configs(Test)
 
 lazy val root = (project in file("."))
-  .enablePlugins(SbtRelease)
-    .settings(
-      releaseProcess := Seq[ReleaseStep](
+  .enablePlugins(ReleasePlugin)
+  .settings(
+    publishTo := {
+      if (isSnapshot.value) {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
+      } else {
+        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
+      }
+    },
+    releaseProcess := Seq[ReleaseStep](
         checkSnapshotDependencies,
         inquireVersions,
         setReleaseVersion,
         commitReleaseVersion,
         tagRelease
-      )
     )
+  )
   .settings(Settings.settings: _*)
