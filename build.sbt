@@ -1,6 +1,6 @@
 import Dependencies._
-import Keys._
-import sbtrelease._
+import sbt.Keys._
+import sbtrelease.ReleaseStateTransformations._
 
 lazy val module1 = (project in file("module1"))
   .settings(Settings.settings: _*)
