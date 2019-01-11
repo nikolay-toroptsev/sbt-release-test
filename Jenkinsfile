@@ -33,7 +33,7 @@ pipeline {
         booleanParam(name: 'RELEASE', defaultValue: false, description: 'Release version')
         booleanParam(name: 'PACKAGE', defaultValue: true, description: 'Package jars')
         booleanParam(name: 'RUN_TEST', defaultValue: true, description: 'Run unit and integration tests')
-        booleanParam(name: 'PUBLISH', defaultValue: getDefaultValue(), description: 'Publish jars')
+        booleanParam(name: 'PUBLISH', defaultValue: getDefaultValue, description: 'Publish jars')
         booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
     }
 
