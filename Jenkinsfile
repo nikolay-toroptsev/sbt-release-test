@@ -55,7 +55,7 @@ pipeline {
 
         stage('Package') {
             when {
-                expression { return params.PACKAGE || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) }
+                expression { return (params.PACKAGE || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) && !params.RELEASE) }
             }
             steps {
                 sh 'sbt package'
@@ -64,7 +64,7 @@ pipeline {
 
         stage('Test') {
             when {
-                expression { return params.RUN_TEST || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) }
+                expression { return (params.RUN_TEST || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) && !params.RELEASE) }
             }
             steps {
                 sh 'sbt test'
@@ -74,7 +74,7 @@ pipeline {
 
         stage('Publish') {
             when {
-                expression { return params.PUBLISH || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) }
+                expression { return (params.PUBLISH || (env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER) && !params.RELEASE) }
             }
             steps {
                 sh 'sbt publish'
@@ -87,6 +87,15 @@ pipeline {
             }
             steps {
                 sh 'sbt release'
+            }
+        }
+
+        stage('Post release') {
+            when {
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
+            }
+            steps {
+                sh 'sbt postRelease'
             }
         }
 

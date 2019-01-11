@@ -1,37 +1,35 @@
+import sbt.Keys._
 import sbt._
-import Keys.{publishTo, _}
 import sbtassembly.AssemblyPlugin.autoImport._
-import sbtrelease.ReleasePlugin.autoImport.{ReleaseStep, releaseProcess, releaseVersionBump}
-import sbtrelease.ReleaseStateTransformations._
 
 object Settings {
+
+  lazy val release = taskKey[Unit]("Release task")
+  lazy val postRelease = taskKey[Unit]("Post release ефыл")
 
   lazy val settings = Seq(
     organization := "com.onefactor.sbt",
     scalaVersion := "2.12.0",
     publishMavenStyle := true,
     publishArtifact in Test := false,
-    publishTo := {
-      if (isSnapshot.value) {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-snapshots;build.timestamp=" + System.currentTimeMillis())
-      } else {
-        Some("Artifactory Realm" at "https://onef.jfrog.io/onef/dl-private-releases")
-      }
+    release := {
+      println(version)
     },
-    releaseVersionBump := sbtrelease.Version.Bump.Next,
-    releaseProcess := Seq[ReleaseStep](
-      checkSnapshotDependencies,
-      inquireVersions,
-      runClean,
-      runTest,
-      setReleaseVersion,
-      commitReleaseVersion,
-      tagRelease,
-      publishArtifacts,
-      setNextVersion,
-      commitNextVersion,
-      pushChanges
-    )
+    postRelease := {
+      println(version)
+    }
+//    releaseProcess := Seq[ReleaseStep](
+//      checkSnapshotDependencies,
+//      inquireVersions,
+//      setReleaseVersion,
+//      commitReleaseVersion,
+//      tagRelease
+//    ),
+//    postReleaseProcess := Seq[ReleaseStep](
+//      setNextVersion,
+//      commitNextVersion,
+//      pushChanges
+//    ),
   )
 
   lazy val testSettings = Seq(
