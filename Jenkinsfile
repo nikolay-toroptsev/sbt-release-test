@@ -40,11 +40,7 @@ pipeline {
     // def masterCheck = env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER
 
     script {
-        def getDefaultValue =
-            if (env.BRANCH_NAME == 'master')
-                true
-            else
-                false
+        def getDefaultValue = env.BRANCH_NAME == 'master' ? true : false
     }
 
     stages {
