@@ -1,5 +1,7 @@
 def isMaster = env.BRANCH_NAME == 'master'
-def skipAllStages = "${env.SKIP_BUILD}" == "true"
+def skipAllStages() {
+    return "${env.SKIP_BUILD}" == "true"
+}
 
 pipeline {
     agent {
