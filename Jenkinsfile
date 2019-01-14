@@ -66,7 +66,8 @@ pipeline {
             when {
                 expression {
                     script {
-                        return isSkip()
+                        println isSkip()
+                        return !isSkip()
                     }
                 }
             }
