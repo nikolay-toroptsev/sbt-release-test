@@ -78,7 +78,7 @@ pipeline {
 
         stage('Release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !isSkip() }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
                 sh 'git config user.name "jenkins-1f"'
@@ -89,7 +89,7 @@ pipeline {
 
         stage('Package') {
             when {
-                expression { return params.PACKAGE && !isSkip() }
+                expression { return params.PACKAGE  }
             }
             steps {
                 sh 'sbt package'
@@ -98,7 +98,7 @@ pipeline {
 
         stage('Test') {
             when {
-                expression { return params.RUN_TEST && !params.RELEASE && !isSkip() }
+                expression { return params.RUN_TEST && !params.RELEASE }
             }
             steps {
                 sh 'sbt test'
@@ -107,7 +107,7 @@ pipeline {
 
         stage('Publish') {
             when {
-                expression { return params.PUBLISH && !isSkip() }
+                expression { return params.PUBLISH }
             }
             steps {
                 sh 'sbt publish'
@@ -117,7 +117,7 @@ pipeline {
 
         stage('Post release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !isSkip() }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
                 sh 'sbt postRelease'
@@ -131,7 +131,7 @@ pipeline {
 
         stage('Deploy release') {
             when {
-                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' && !isSkip() }
+                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' }
             }
             environment {
                 RANCHER_SECRET_KEY = credentials('ml-engine_secret_key_prod_rancher')
