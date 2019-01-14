@@ -28,6 +28,7 @@ object PostReleasePlugin extends AutoPlugin {
       IO.writeLines(versionFile, Seq(globalVersionString format nextVersion))
       ReleaseStateTransformations.reapply(Seq(version in ThisBuild := nextVersion), (state in ThisBuild).value)
 //      git.runner.value.commitAndPush("Post release new snapshot version")(file("."), ConsoleLogger())
+      git.runner.value("add", "--all")(file("."), ConsoleLogger())
       git.runner.value("commit", "-m", "[Technical commit] Post release new snapshot version")(file("."), ConsoleLogger())
     }
   )
