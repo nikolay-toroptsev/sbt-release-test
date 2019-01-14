@@ -51,7 +51,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                // sh 'git checkout'
+                sh 'git pull'
                 sh 'git config user.name "jenkins-1f"'
                 sh 'git config user.email "jenkins@onefactor.com"'
                 sh 'sbt clean'
