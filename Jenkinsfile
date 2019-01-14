@@ -1,3 +1,5 @@
+def masterDefaultValue = env.BRANCH_NAME == 'master'
+
 pipeline {
     agent {
         docker {
@@ -27,8 +29,6 @@ pipeline {
         ARTIFACTORY_USERNAME = "uploader"
         SBT_OPTS = "-Xmx3G"
     }
-
-    def masterDefaultValue = env.BRANCH_NAME == 'master'
 
     parameters {
         booleanParam(name: 'RUN_ALL_STAGES_ON_MASTER', defaultValue: false, description: 'Uncheck to enable stages configuration on master')
