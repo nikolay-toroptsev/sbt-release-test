@@ -65,15 +65,16 @@ pipeline {
             steps {
                 // sh 'git checkout master'
                 // sh 'git remote set-url origin git@github.com:nikolay-toroptsev/sbt-release-test.git'
-                // sh 'git config user.name "jenkins-1f"'
-                // sh 'git config user.email "jenkins@onefactor.com"'
-                script {
+
+                sh 'git config user.name "jenkins-1f"'
+                sh 'git config user.email "jenkins@onefactor.com"'
+
+                /* script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-                        sh 'echo ${env.GIT_USERNAME}'
                         sh 'git config user.name "${env.GIT_USERNAME}"'
                         sh 'git config user.email "jenkins@onefactor.com"'
                     }
-                }
+                } */
                 sh 'sbt "release with-defaults default-tag-exists-answer o"'
             }
         }
