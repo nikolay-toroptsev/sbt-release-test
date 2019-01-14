@@ -42,6 +42,14 @@ pipeline {
 
         stage('Prepare env') {
             steps {
+                script {
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
+                        env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
+                        println "Tech commit: ${env.TECH_COMMIT}"
+                        if (env.TECH_COMMIT)
+                            exit 0
+                    }
+                }
                 sh "printenv"
 
             }
