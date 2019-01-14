@@ -45,9 +45,21 @@ pipeline {
             steps {
                 script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-                        env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true)
-                        println "Tech commit: ${env.TECH_COMMIT}"
-                        if (env.TECH_COMMIT) {
+                        env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
+                        println "Tech commit flag: ${env.TECH_COMMIT}"
+                        println "Testing bools:"
+                        if (env.TECH_COMMIT)
+                            println "This is tech commit"
+                        else
+                            println "This is NOT tech commit"
+
+                        if (!env.TECH_COMMIT)
+                            println "This is NOT tech commit 2"
+                        else
+                            println "This is tech commit 2"
+
+                        if (currentBuild.rawBuild.getCause(jenkins.branch.BranchEventCause) && env.TECH_COMMIT) {
+                            println "Info: This is technical commit. Skipping..."
                             currentBuild.result = "SUCCESS"
                             sh "exit 0"
                         }
