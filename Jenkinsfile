@@ -1,5 +1,5 @@
 def isMaster = env.BRANCH_NAME == 'master'
-def skipAllStages() {
+boolean skipAllStages() {
     return "${env.SKIP_BUILD}" == "true"
 }
 
