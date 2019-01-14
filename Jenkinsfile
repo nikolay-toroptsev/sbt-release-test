@@ -1,4 +1,4 @@
-def masterDefaultValue = env.BRANCH_NAME != 'master'
+def isMaster = env.BRANCH_NAME == 'master'
 
 pipeline {
     agent {
@@ -33,13 +33,11 @@ pipeline {
     parameters {
         booleanParam(name: 'RUN_ALL_STAGES_ON_MASTER', defaultValue: false, description: 'Uncheck to enable stages configuration on master')
         booleanParam(name: 'RELEASE', defaultValue: false, description: 'Release version')
-        booleanParam(name: 'PACKAGE', defaultValue: masterDefaultValue, description: 'Package jars')
-        booleanParam(name: 'RUN_TEST', defaultValue: masterDefaultValue, description: 'Run unit and integration tests')
+        booleanParam(name: 'PACKAGE', defaultValue: env.BRANCH_NAME == 'master', description: 'Package jars')
+        booleanParam(name: 'RUN_TEST', defaultValue: isMaster, description: 'Run unit and integration tests')
         booleanParam(name: 'PUBLISH', defaultValue: false, description: 'Publish jars')
         booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
     }
-
-    // def masterCheck = env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER
 
     stages {
 
@@ -107,7 +105,7 @@ pipeline {
                 sh 'sbt postRelease'
                 script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-                        sh "git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/kycml/sbt-release-test.git --tags"
+                        sh "git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/kycml/sbt-release-test.git --follow-tags"
                     }
                 }
             }
