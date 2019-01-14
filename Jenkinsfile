@@ -1,4 +1,5 @@
 def isMaster = env.BRANCH_NAME == 'master'
+def isSkip = env.SKIP == 'true'
 
 pipeline {
     agent {
@@ -43,6 +44,12 @@ pipeline {
         stage('Prepare env') {
             steps {
                 script {
+                    println "Test env.SKIP: ${env.SKIP}"
+                    println "Test isSkip: ${isSkip}"
+                    env.SKIP = 'true'
+                    println "Test env.SKIP after setting to true: ${env.SKIP}"
+                    println "Test isSkip after setting to true: ${isSkip}"
+
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
 
@@ -59,32 +66,12 @@ pipeline {
             }
         }
 
-        stage('Skip on tech') {
-            when {
-                expression { return env.SKIP_BUILD == 'true' }
-            }
-            steps {
-                sh "echo 'SKIP_BUILD == true'"
-            }
-        }
-
-        stage('Unskip on tech') {
-            when {
-                expression { return env.SKIP_BUILD == 'false' }
-            }
-            steps {
-                sh "echo 'SKIP_BUILD == false'"
-            }
-        }
-
         stage('Checkout') {
             when {
                 expression { return env.SKIP_BUILD == 'false' }
             }
             steps {
                 checkout scm
-
-                //sh 'git config -l'
                 sh 'sbt clean'
             }
         }
@@ -115,7 +102,6 @@ pipeline {
             }
             steps {
                 sh 'sbt test'
-
             }
         }
 
