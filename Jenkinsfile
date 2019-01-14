@@ -29,12 +29,16 @@ pipeline {
     }
 
     parameters {
-        booleanParam(name: 'RUN_ALL_STAGES_ON_MASTER', defaultValue: false, description: 'Uncheck to enable stages configuration on master')
-        booleanParam(name: 'RELEASE', defaultValue: true, description: 'Release version')
-        booleanParam(name: 'PACKAGE', defaultValue: false, description: 'Package jars')
-        booleanParam(name: 'RUN_TEST', defaultValue: false, description: 'Run unit and integration tests')
-        booleanParam(name: 'PUBLISH', defaultValue: false, description: 'Publish jars')
-        booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
+        script {
+            def masterDefaultValue = env.BRANCH_NAME == 'master'
+
+            //booleanParam(name: 'RUN_ALL_STAGES_ON_MASTER', defaultValue: false, description: 'Uncheck to enable stages configuration on master')
+            booleanParam(name: 'RELEASE', defaultValue: false, description: 'Release version')
+            booleanParam(name: 'PACKAGE', defaultValue: masterDefaultValue, description: 'Package jars')
+            booleanParam(name: 'RUN_TEST', defaultValue: masterDefaultValue, description: 'Run unit and integration tests')
+            booleanParam(name: 'PUBLISH', defaultValue: false, description: 'Publish jars')
+            booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
+        }
     }
 
     // def masterCheck = env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER
@@ -63,18 +67,8 @@ pipeline {
                 expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
-                // sh 'git checkout master'
-                // sh 'git remote set-url origin git@github.com:nikolay-toroptsev/sbt-release-test.git'
-
                 sh 'git config user.name "jenkins-1f"'
                 sh 'git config user.email "jenkins@onefactor.com"'
-
-                /* script {
-                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-                        sh 'git config user.name "${env.GIT_USERNAME}"'
-                        sh 'git config user.email "jenkins@onefactor.com"'
-                    }
-                } */
                 sh 'sbt "release with-defaults default-tag-exists-answer o"'
             }
         }
@@ -114,15 +108,11 @@ pipeline {
             }
             steps {
                 sh 'sbt postRelease'
-                // sh 'git config user.name "jenkins-1f"'
-                // sh 'git config user.email "jenkins@onefactor.com"'
                 script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         sh "git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/kycml/sbt-release-test.git --tags"
                     }
                 }
-                //push scm
-                //push tags
             }
         }
 
