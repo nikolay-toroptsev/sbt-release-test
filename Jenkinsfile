@@ -64,7 +64,11 @@ pipeline {
 
         stage('Checkout') {
             when {
-                expression { return !isSkip() }
+                expression {
+                    script {
+                        return !isSkip()
+                    }
+                }
             }
             steps {
                 checkout scm
