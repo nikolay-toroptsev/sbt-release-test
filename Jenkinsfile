@@ -28,17 +28,15 @@ pipeline {
         SBT_OPTS = "-Xmx3G"
     }
 
-    script {
-        def masterDefaultValue = env.BRANCH_NAME == 'master'
+    def masterDefaultValue = env.BRANCH_NAME == 'master'
 
-        parameters {
-            //booleanParam(name: 'RUN_ALL_STAGES_ON_MASTER', defaultValue: false, description: 'Uncheck to enable stages configuration on master')
-            booleanParam(name: 'RELEASE', defaultValue: false, description: 'Release version')
-            booleanParam(name: 'PACKAGE', defaultValue: masterDefaultValue, description: 'Package jars')
-            booleanParam(name: 'RUN_TEST', defaultValue: masterDefaultValue, description: 'Run unit and integration tests')
-            booleanParam(name: 'PUBLISH', defaultValue: false, description: 'Publish jars')
-            booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
-        }
+    parameters {
+        booleanParam(name: 'RUN_ALL_STAGES_ON_MASTER', defaultValue: false, description: 'Uncheck to enable stages configuration on master')
+        booleanParam(name: 'RELEASE', defaultValue: false, description: 'Release version')
+        booleanParam(name: 'PACKAGE', defaultValue: masterDefaultValue, description: 'Package jars')
+        booleanParam(name: 'RUN_TEST', defaultValue: masterDefaultValue, description: 'Run unit and integration tests')
+        booleanParam(name: 'PUBLISH', defaultValue: false, description: 'Publish jars')
+        booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
     }
 
     // def masterCheck = env.BRANCH_NAME == 'master' && params.RUN_ALL_STAGES_ON_MASTER
