@@ -66,11 +66,14 @@ pipeline {
             when {
                 expression {
                     script {
-                        return !isSkip()
+                        return isSkip()
                     }
                 }
             }
             steps {
+                script {
+                    println isSkip()
+                }
                 checkout scm
                 sh 'sbt clean'
             }
