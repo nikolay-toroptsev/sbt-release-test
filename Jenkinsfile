@@ -121,7 +121,7 @@ pipeline {
 
         stage('Publish') {
             when {
-                expression { return params.PUBLISH && && env.SKIP_BUILD == 'false' }
+                expression { return params.PUBLISH && env.SKIP_BUILD == 'false' }
             }
             steps {
                 sh 'sbt publish'
