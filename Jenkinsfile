@@ -65,7 +65,7 @@ pipeline {
 
         stage('Skip on tech') {
             when {
-                expression { return skipAllStages }
+                expression { return skipAllStages() }
             }
             steps {
                 sh "echo 'skipAllStages == true'"
@@ -74,7 +74,7 @@ pipeline {
 
         stage('Unskip on tech') {
             when {
-                expression { return !skipAllStages }
+                expression { return !skipAllStages() }
             }
             steps {
                 sh "echo 'skipAllStages == false'"
