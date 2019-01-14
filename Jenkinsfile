@@ -1,5 +1,5 @@
 def isMaster = env.BRANCH_NAME == 'master'
-def skipAllStages = env.TECH_COMMIT == '0'
+def skipAllStages = "${env.SKIP_BUILD}" == "true"
 
 pipeline {
     agent {
@@ -47,28 +47,35 @@ pipeline {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
 
+                        // booleans doesn't work...
                         if (currentBuild.rawBuild.getCause(jenkins.branch.BranchEventCause) && "${env.TECH_COMMIT}" == "true") {
                             println "Info: This is technical commit. Skipping..."
-                            env.SKIP_BUILD = true
+                            env.SKIP_BUILD = "true"
                         } else {
-                            env.SKIP_BUILD = false
+                            env.SKIP_BUILD = "false"
                         }
-
-                        print "Test bools: "
-                        if (env.SKIP_BUILD)
-                            println "Skipping build"
-                        else
-                            println "NOT skipping build"
-
-                        print "Test bools2: "
-                        if (!env.SKIP_BUILD)
-                            println "NOT skipping build"
-                        else
-                            println "Skipping build"
                     }
                 }
                 sh "printenv"
 
+            }
+        }
+
+        stage('Skip on tech') {
+            when {
+                expression { return skipAllStages }
+            }
+            steps {
+                sh "echo 'skipAllStages == true'"
+            }
+        }
+
+        stage('Unskip on tech') {
+            when {
+                expression { return !skipAllStages }
+            }
+            steps {
+                sh "echo 'skipAllStages == false'"
             }
         }
 
