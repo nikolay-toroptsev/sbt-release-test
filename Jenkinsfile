@@ -46,23 +46,25 @@ pipeline {
                 script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
-                        println "Tech commit flag: ${env.TECH_COMMIT}"
-                        println "Testing bools:"
-                        if ("${env.TECH_COMMIT}" == "true")
-                            println "This is tech commit"
-                        else
-                            println "This is NOT tech commit"
 
-                        if ("${env.TECH_COMMIT}" == "false")
-                            println "This is NOT tech commit 2"
-                        else
-                            println "This is tech commit 2"
-
-                        if (currentBuild.rawBuild.getCause(jenkins.branch.BranchEventCause) && env.TECH_COMMIT) {
+                        if (currentBuild.rawBuild.getCause(jenkins.branch.BranchEventCause) && "${env.TECH_COMMIT}" == "true") {
                             println "Info: This is technical commit. Skipping..."
-                            currentBuild.result = "SUCCESS"
-                            sh "exit 0"
+                            env.SKIP_BUILD = true
+                        } else {
+                            env.SKIP_BUILD = false
                         }
+
+                        print "Test bools: "
+                        if (env.SKIP_BUILD)
+                            println "Skipping build"
+                        else
+                            println "NOT skipping build"
+
+                        print "Test bools2: "
+                        if (!env.SKIP_BUILD)
+                            println "NOT skipping build"
+                        else
+                            println "Skipping build"
                     }
                 }
                 sh "printenv"
