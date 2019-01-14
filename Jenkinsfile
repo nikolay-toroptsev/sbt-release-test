@@ -1,4 +1,4 @@
-def masterDefaultValue = env.BRANCH_NAME == 'master'
+def masterDefaultValue = env.BRANCH_NAME != 'master'
 
 pipeline {
     agent {
@@ -54,8 +54,7 @@ pipeline {
             steps {
                 checkout scm
 
-                // sh 'git pull'
-                sh 'git config -l'
+                //sh 'git config -l'
                 sh 'sbt clean'
             }
         }
