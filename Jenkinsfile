@@ -46,42 +46,41 @@ pipeline {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
 
-                        // booleans doesn't work...
+                        // env variables are only strings
                         if (currentBuild.rawBuild.getCause(jenkins.branch.BranchEventCause) && "${env.TECH_COMMIT}" == "true") {
                             println "Info: This is technical commit. Skipping..."
                             env.SKIP_BUILD = "true"
                         } else {
                             env.SKIP_BUILD = "false"
+                            sh "printenv"
                         }
                     }
                 }
-                sh "printenv"
-
             }
         }
 
         stage('Skip on tech') {
             when {
-                expression { return "${env.SKIP_BUILD}" == "true" }
+                expression { return env.SKIP_BUILD == 'true' }
             }
             steps {
-                sh "echo 'skipAllStages == true'"
+                sh "echo 'SKIP_BUILD == true'"
             }
         }
 
         stage('Unskip on tech') {
             when {
-                expression { return "${env.SKIP_BUILD}" == "false" }
+                expression { return env.SKIP_BUILD == 'false' }
             }
             steps {
-                sh "echo 'skipAllStages == false'"
+                sh "echo 'SKIP_BUILD == false'"
             }
         }
 
         stage('Checkout') {
-            /*when {
-                expression { return env.TECH_COMMIT }
-            }*/
+            when {
+                expression { return env.SKIP_BUILD == 'false' }
+            }
             steps {
                 checkout scm
 
@@ -92,7 +91,7 @@ pipeline {
 
         stage('Release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && env.SKIP_BUILD == 'false' }
             }
             steps {
                 sh 'git config user.name "jenkins-1f"'
@@ -103,7 +102,7 @@ pipeline {
 
         stage('Package') {
             when {
-                expression { return (params.PACKAGE ) }
+                expression { return params.PACKAGE && env.SKIP_BUILD == 'false' }
             }
             steps {
                 sh 'sbt package'
@@ -112,7 +111,7 @@ pipeline {
 
         stage('Test') {
             when {
-                expression { return (params.RUN_TEST && !params.RELEASE ) }
+                expression { return params.RUN_TEST && !params.RELEASE && env.SKIP_BUILD == 'false' }
             }
             steps {
                 sh 'sbt test'
@@ -122,7 +121,7 @@ pipeline {
 
         stage('Publish') {
             when {
-                expression { return params.PUBLISH && !env.TECH_COMMIT}
+                expression { return params.PUBLISH && && env.SKIP_BUILD == 'false' }
             }
             steps {
                 sh 'sbt publish'
@@ -132,7 +131,7 @@ pipeline {
 
         stage('Post release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && env.SKIP_BUILD == 'false' }
             }
             steps {
                 sh 'sbt postRelease'
@@ -146,7 +145,7 @@ pipeline {
 
         stage('Deploy release') {
             when {
-                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' }
+                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' && env.SKIP_BUILD == 'false' }
             }
             environment {
                 RANCHER_SECRET_KEY = credentials('ml-engine_secret_key_prod_rancher')
