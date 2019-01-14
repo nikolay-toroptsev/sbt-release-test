@@ -1,4 +1,5 @@
 def isMaster = env.BRANCH_NAME == 'master'
+def skipAllStages = env.TECH_COMMIT == '0'
 
 pipeline {
     agent {
@@ -44,7 +45,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-                        env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
+                        env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true)
                         println "Tech commit: ${env.TECH_COMMIT}"
                         if (env.TECH_COMMIT) {
                             currentBuild.result = "SUCCESS"
@@ -58,9 +59,9 @@ pipeline {
         }
 
         stage('Checkout') {
-            when {
+            /*when {
                 expression { return env.TECH_COMMIT }
-            }
+            }*/
             steps {
                 checkout scm
 
@@ -71,7 +72,7 @@ pipeline {
 
         stage('Release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !env.TECH_COMMIT }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
                 sh 'git config user.name "jenkins-1f"'
@@ -82,7 +83,7 @@ pipeline {
 
         stage('Package') {
             when {
-                expression { return (params.PACKAGE && !env.TECH_COMMIT) }
+                expression { return (params.PACKAGE ) }
             }
             steps {
                 sh 'sbt package'
@@ -91,7 +92,7 @@ pipeline {
 
         stage('Test') {
             when {
-                expression { return (params.RUN_TEST && !params.RELEASE && !env.TECH_COMMIT ) }
+                expression { return (params.RUN_TEST && !params.RELEASE ) }
             }
             steps {
                 sh 'sbt test'
@@ -111,7 +112,7 @@ pipeline {
 
         stage('Post release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !env.TECH_COMMIT }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
                 sh 'sbt postRelease'
@@ -125,7 +126,7 @@ pipeline {
 
         stage('Deploy release') {
             when {
-                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' && !env.TECH_COMMIT }
+                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' }
             }
             environment {
                 RANCHER_SECRET_KEY = credentials('ml-engine_secret_key_prod_rancher')
