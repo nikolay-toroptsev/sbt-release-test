@@ -32,9 +32,9 @@ pipeline {
 
     parameters {
         booleanParam(name: 'RELEASE', defaultValue: false, description: 'Release current version')
-        booleanParam(name: 'PACKAGE', defaultValue: isMaster, description: 'Package jars')
-        booleanParam(name: 'RUN_TEST', defaultValue: isMaster, description: 'Run unit and integration tests')
-        booleanParam(name: 'PUBLISH', defaultValue: false, description: 'Publish jars')
+        booleanParam(name: 'PACKAGE', defaultValue: true, description: 'Package jars')
+        booleanParam(name: 'RUN_TEST', defaultValue: true, description: 'Run unit and integration tests')
+        booleanParam(name: 'PUBLISH', defaultValue: !isMaster, description: 'Publish jars')
         booleanParam(name: 'DEPLOY_RELEASE', defaultValue: false, description: 'Deploy images to prod environment')
     }
 
@@ -46,6 +46,10 @@ pipeline {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
                         println "Tech commit: ${env.TECH_COMMIT}"
+                        if (env.TECH_COMMIT) {
+                            currentBuild.result = "SUCCESS"
+                            sh "exit 0"
+                        }
                     }
                 }
                 sh "printenv"
@@ -55,7 +59,7 @@ pipeline {
 
         stage('Checkout') {
             when {
-                expression { return !env.TECH_COMMIT }
+                expression { return env.TECH_COMMIT }
             }
             steps {
                 checkout scm
