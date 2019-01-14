@@ -1,7 +1,4 @@
 def isMaster = env.BRANCH_NAME == 'master'
-boolean skipAllStages() {
-    return "${env.SKIP_BUILD}" == "true"
-}
 
 pipeline {
     agent {
@@ -65,7 +62,7 @@ pipeline {
 
         stage('Skip on tech') {
             when {
-                expression { return skipAllStages() }
+                expression { return "${env.SKIP_BUILD}" == "true" }
             }
             steps {
                 sh "echo 'skipAllStages == true'"
@@ -74,7 +71,7 @@ pipeline {
 
         stage('Unskip on tech') {
             when {
-                expression { return !skipAllStages() }
+                expression { return "${env.SKIP_BUILD}" == "false" }
             }
             steps {
                 sh "echo 'skipAllStages == false'"
