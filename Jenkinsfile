@@ -53,6 +53,7 @@ pipeline {
                 checkout scm
 
                 // sh 'git pull'
+                sh 'git config -l'
                 sh 'sbt clean'
             }
         }
