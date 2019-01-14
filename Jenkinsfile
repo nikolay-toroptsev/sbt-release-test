@@ -48,12 +48,12 @@ pipeline {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
                         println "Tech commit flag: ${env.TECH_COMMIT}"
                         println "Testing bools:"
-                        if (env.TECH_COMMIT)
+                        if ("${env.TECH_COMMIT}" == "true")
                             println "This is tech commit"
                         else
                             println "This is NOT tech commit"
 
-                        if (!env.TECH_COMMIT)
+                        if ("${env.TECH_COMMIT}" == "false")
                             println "This is NOT tech commit 2"
                         else
                             println "This is tech commit 2"
