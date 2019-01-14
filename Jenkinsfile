@@ -46,8 +46,6 @@ pipeline {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
                         println "Tech commit: ${env.TECH_COMMIT}"
-                        if (env.TECH_COMMIT)
-                            exit 0
                     }
                 }
                 sh "printenv"
@@ -56,6 +54,9 @@ pipeline {
         }
 
         stage('Checkout') {
+            when {
+                expression { return !env.TECH_COMMIT }
+            }
             steps {
                 checkout scm
 
@@ -66,7 +67,7 @@ pipeline {
 
         stage('Release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !env.TECH_COMMIT }
             }
             steps {
                 sh 'git config user.name "jenkins-1f"'
@@ -77,7 +78,7 @@ pipeline {
 
         stage('Package') {
             when {
-                expression { return (params.PACKAGE && !params.RELEASE) }
+                expression { return (params.PACKAGE && !env.TECH_COMMIT) }
             }
             steps {
                 sh 'sbt package'
@@ -86,7 +87,7 @@ pipeline {
 
         stage('Test') {
             when {
-                expression { return (params.RUN_TEST && !params.RELEASE) }
+                expression { return (params.RUN_TEST && !params.RELEASE && !env.TECH_COMMIT ) }
             }
             steps {
                 sh 'sbt test'
@@ -96,7 +97,7 @@ pipeline {
 
         stage('Publish') {
             when {
-                expression { return params.PUBLISH }
+                expression { return params.PUBLISH && !env.TECH_COMMIT}
             }
             steps {
                 sh 'sbt publish'
@@ -106,7 +107,7 @@ pipeline {
 
         stage('Post release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !env.TECH_COMMIT }
             }
             steps {
                 sh 'sbt postRelease'
@@ -120,7 +121,7 @@ pipeline {
 
         stage('Deploy release') {
             when {
-                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' }
+                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' && !env.TECH_COMMIT }
             }
             environment {
                 RANCHER_SECRET_KEY = credentials('ml-engine_secret_key_prod_rancher')
@@ -133,5 +134,3 @@ pipeline {
         }
     }
 }
-
-//def getDefaultValue = env.BRANCH_NAME == 'master' ? true : false
