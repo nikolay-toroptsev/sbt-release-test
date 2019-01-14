@@ -51,9 +51,8 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                sh 'git pull'
-                sh 'git config user.name "jenkins-1f"'
-                sh 'git config user.email "jenkins@onefactor.com"'
+
+                // sh 'git pull'
                 sh 'sbt clean'
             }
         }
@@ -63,7 +62,7 @@ pipeline {
                 expression { return params.RELEASE && env.BRANCH_NAME == 'master' }
             }
             steps {
-                sh 'git checkout master'
+                // sh 'git checkout master'
                 // sh 'git remote set-url origin git@github.com:nikolay-toroptsev/sbt-release-test.git'
                 sh 'sbt "release with-defaults default-tag-exists-answer o"'
             }
@@ -104,10 +103,11 @@ pipeline {
             }
             steps {
                 sh 'sbt postRelease'
+                // sh 'git config user.name "jenkins-1f"'
+                // sh 'git config user.email "jenkins@onefactor.com"'
                 script {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
-                        sh 'git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/kycml/sbt-release-test.git'
-                        sh 'git push --tag https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/kycml/sbt-release-test.git'
+                        sh 'git push https://${env.GIT_USERNAME}:${env.GIT_PASSWORD}@github.com/kycml/sbt-release-test.git --tags'
                     }
                 }
                 //push scm
