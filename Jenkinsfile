@@ -1,6 +1,6 @@
 def isMaster = env.BRANCH_NAME == 'master'
 boolean isSkip() {
-    return env.SKIP == 'true'
+    return env.SKIP_BUILD == 'true'
 }
 
 pipeline {
@@ -46,15 +46,6 @@ pipeline {
         stage('Prepare env') {
             steps {
                 script {
-                    println "Test env.SKIP: ${env.SKIP}"
-                    println "Test isSkip: ${isSkip()}"
-                    env.SKIP = 'true'
-                    println "Test env.SKIP after setting to true: ${env.SKIP}"
-                    println "Test isSkip after setting to true: ${isSkip()}"
-                    env.SKIP = 'false'
-                    println "Test env.SKIP after setting to false: ${env.SKIP}"
-                    println "Test isSkip after setting to false: ${isSkip()}"
-
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: '560a8652-d4c5-405f-ac8b-4569ff0f6381', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD']]) {
                         env.TECH_COMMIT = sh(script: "git log -n 1 --pretty=format:'%an' | grep ${env.GIT_USERNAME}", returnStatus: true) == 0
 
@@ -73,7 +64,7 @@ pipeline {
 
         stage('Checkout') {
             when {
-                expression { return env.SKIP_BUILD == 'false' }
+                expression { return !isSkip() }
             }
             steps {
                 checkout scm
@@ -83,7 +74,7 @@ pipeline {
 
         stage('Release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && env.SKIP_BUILD == 'false' }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !isSkip() }
             }
             steps {
                 sh 'git config user.name "jenkins-1f"'
@@ -94,7 +85,7 @@ pipeline {
 
         stage('Package') {
             when {
-                expression { return params.PACKAGE && env.SKIP_BUILD == 'false' }
+                expression { return params.PACKAGE && !isSkip() }
             }
             steps {
                 sh 'sbt package'
@@ -103,7 +94,7 @@ pipeline {
 
         stage('Test') {
             when {
-                expression { return params.RUN_TEST && !params.RELEASE && env.SKIP_BUILD == 'false' }
+                expression { return params.RUN_TEST && !params.RELEASE && !isSkip() }
             }
             steps {
                 sh 'sbt test'
@@ -112,7 +103,7 @@ pipeline {
 
         stage('Publish') {
             when {
-                expression { return params.PUBLISH && env.SKIP_BUILD == 'false' }
+                expression { return params.PUBLISH && !isSkip() }
             }
             steps {
                 sh 'sbt publish'
@@ -122,7 +113,7 @@ pipeline {
 
         stage('Post release') {
             when {
-                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && env.SKIP_BUILD == 'false' }
+                expression { return params.RELEASE && env.BRANCH_NAME == 'master' && !isSkip() }
             }
             steps {
                 sh 'sbt postRelease'
@@ -136,7 +127,7 @@ pipeline {
 
         stage('Deploy release') {
             when {
-                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' && env.SKIP_BUILD == 'false' }
+                expression { return params.DEPLOY_RELEASE && env.BRANCH_NAME == 'master' && !isSkip() }
             }
             environment {
                 RANCHER_SECRET_KEY = credentials('ml-engine_secret_key_prod_rancher')
