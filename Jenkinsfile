@@ -93,7 +93,7 @@ pipeline {
 
         stage('Package') {
             when {
-                expression { return params.PACKAGE  }
+                expression { return params.PACKAGE && env.SKIP_BUILD != 'true'  }
             }
             steps {
                 sh 'sbt package'
